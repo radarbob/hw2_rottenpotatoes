@@ -9,6 +9,7 @@ class MoviesController < ApplicationController
 
   def index
     #debugger
+    @all_ratings = Movie.ratings
     @sortColumn = params[:sort]
     @movies = Movie.find(:all, :order => params[:sort])   #doesn't care if :sort doesn't exist
     # @movies = Movie.order(params[:sort])   #the future!
