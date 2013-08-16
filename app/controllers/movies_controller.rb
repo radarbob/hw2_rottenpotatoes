@@ -1,5 +1,6 @@
 class MoviesController < ApplicationController
 
+  
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -7,7 +8,10 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    #debugger
+    @sortColumn = params[:sort]
+    @movies = Movie.find(:all, :order => params[:sort])   #doesn't care if :sort doesn't exist
+    # @movies = Movie.order(params[:sort])   #the future!
   end
 
   def new
@@ -37,5 +41,10 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
+  
+  def sort
+    sortColumn = params[:sort] == :title_header ? 'title' : 'release_date'
+    @movies = Movie.find(:all, :order => '#{sortColumn} DESC')
+  end
 
-end
+end   #MoviesController
