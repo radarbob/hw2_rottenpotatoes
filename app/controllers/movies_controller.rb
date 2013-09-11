@@ -1,6 +1,4 @@
 class MoviesController < ApplicationController
-
-  
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -8,11 +6,43 @@ class MoviesController < ApplicationController
   end
 
   def index
-    #debugger
-    @all_ratings = Movie.ratings
-    @sortColumn = params[:sort]
-    @movies = Movie.find(:all, :order => params[:sort])   #doesn't care if :sort doesn't exist
-    # @movies = Movie.order(params[:sort])   #the future!
+    puts "**************** start index ********************"
+    puts "params incoming: " + params.inspect
+    
+    @all_ratings = Hash[ *Movie.ratings.collect { |v| [ v, 1] }.flatten ] 
+    @checked_ratings = params[:ratings].nil? ? @all_ratings : params[:ratings]
+    set_checked_ratings  
+    
+    puts "after set-checked @all-ratings: #{@all_settings}"
+    
+    @checkedRatings = @all_ratings.select {|k,v| v == 1}.keys    # and array for the order clause
+    puts "checkedRatings: #{@checkedRatings.inspect}"
+    
+    #sort_by_column  
+    @sort_column = params[:sort] || session[:sort]
+
+    puts "@all_ratings: " + @all_ratings.inspect
+    puts "@checkedRatings: " +  @checkedRatings.inspect
+    puts "@sort_column:" + @sort_column.inspect
+    
+    @movies = Movie.where(rating: @checkedRatings).order(@sort_column || "")   #the future!
+    
+    puts "************ end index ***************"
+  end
+  
+  def set_checked_ratings 
+    puts "@all_ratings BEFORE setting against params[:ratings]  " + @all_ratings.inspect
+    
+    @all_ratings.each do |k, v|
+      unless @checked_ratings.has_key? k then @all_ratings[k] = 0 end
+    end
+    
+    puts "@all_ratings AFTER setting against params[:ratings]  " + @all_ratings.inspect
+    if @all_ratings.values.all? {|v| v == 0} then 
+      @all_ratings.each do |key,value| @all_ratings[key] = 1 end
+    end
+    
+    puts "@all_ratings after values.all?  " + @all_ratings.inspect
   end
 
   def new
@@ -43,9 +73,8 @@ class MoviesController < ApplicationController
     redirect_to movies_path
   end
   
-  def sort
-    sortColumn = params[:sort] == :title_header ? 'title' : 'release_date'
-    @movies = Movie.find(:all, :order => '#{sortColumn} DESC')
+  def sort_by_column
+    if params[:sort] == 'title' then @sort_column = {:sort=>"title"} end 
+    if params[:sort] == 'release_date' then @sort_column = {:sort=>"release_date"} end
   end
-
 end   #MoviesController
