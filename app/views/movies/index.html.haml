@@ -7,9 +7,9 @@
   
   Include:  
   -# above is literal text 
-  - @all_ratings.each do |rating, value|
+  - @all_ratings.each do |rating|
     = rating
-    = check_box_tag "ratings[#{rating}]", value, value == 1
+    = check_box_tag "rating[#{rating[0]}]", rating[1], rating[1] == 1
   -# looks like "value" & "checked" parameters must be in synch 1=>true 0=>false
   -# the form get will have a params[:ratings] hash containing all checked boxes.
   = submit_tag 'Refresh'
