@@ -1,15 +1,15 @@
 -#  This file is app/views/movies/index.html.haml
 %h1 All Movies
 
-= form_tag movies_path, {:id=>"ratings_form", :method => :get}, do
+= form_tag movies_path, {:id=>"ratings_form", :method => :get} do
   -# OK, the "options" hash parameter is the tag's attributes.
   = hidden_field_tag "sort", @sort_column == "title" ? "title" : "release_date"
   
   Include:  
   -# above is literal text 
-  - @all_ratings.each do |rating|
+  - @all_ratings.each do |rating, value|
     = rating
-    = check_box_tag "rating[#{rating[0]}]", rating[1], rating[1] == 1
+    = check_box_tag "rating[#{rating}]", value, value == 1
   -# looks like "value" & "checked" parameters must be in synch 1=>true 0=>false
   -# the form get will have a params[:ratings] hash containing all checked boxes.
   = submit_tag 'Refresh'
