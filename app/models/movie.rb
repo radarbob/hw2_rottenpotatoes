@@ -4,5 +4,4 @@ class Movie < ActiveRecord::Base
   def Movie.ratings
     return @@ratings
   end
-    
 end

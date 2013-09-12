@@ -7,9 +7,9 @@
   
   Include:  
   -# above is literal text 
-  - @all_ratings.each do |rating, value|
+  - @all_ratings.each do |rating|
     = rating
-    = check_box_tag "ratings[#{rating}]", value, value == 1
+    = check_box_tag "ratings[#{rating}]", rating, (@checked_ratings.include? rating)
     -# looks like "value" & "checked" parameters must be in synch 1=>true 0=>false
     -# the form get will have a params[:ratings] hash containing all checked boxes.
   = submit_tag 'Refresh'
@@ -18,10 +18,10 @@
   %thead
     %tr
       %th{:class=>('hilite' if @sort_column == 'title')}
-        = link_to "Movie Title", movies_path(:ratings=>@all_ratings.select {|k,v| v == 1}, :sort=>"title"), {id: "title_header"}
+        = link_to "Movie Title", movies_path(:ratings=>@checked_ratings, :sort=>"title"), {id: "title_header"}
       %th Rating
       %th{:class=>('hilite' if @sort_column == 'release_date')}
-        = link_to "Release Date", movies_path(:ratings=>@all_ratings.select {|k,v| v == 1}, :sort=>"release_date"), {id: "release_date_header"}
+        = link_to "Release Date", movies_path(:ratings=>@checked_ratings, :sort=>"release_date"), {id: "release_date_header"}
       %th More Info 
   %tbody
     - @movies.each do |movie|

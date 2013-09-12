@@ -5,26 +5,22 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
-  def index
-    @all_ratings = Hash[ *Movie.ratings.collect { |v| [ v, 1] }.flatten ] 
-    @checked_ratings = params[:ratings].nil? ? @all_ratings : params[:ratings]
-    set_checked_ratings
+  def index 
+     @all_ratings = Movie.ratings # an array
     
-    @checkedRatings = @all_ratings.select {|k,v| v == 1}.keys    # and array for the order clause
-    #sort_by_column  
-    @sort_column = params[:sort] || session[:sort]
+    # params.ratings is nil if we didn't come from /Movies 
+    # use session.ratings if all CBs are un-checked or params.ratings is nil
+    # as a last resort check all CBs.
+    
+    @checked_ratings = params[:ratings].nil? ? 
+              session[:ratings].nil? ? @all_ratings : session[:ratings] :
+              (params[:ratings].is_a? Hash) ? params[:ratings].keys : params[:ratings]
+    
+    session[:ratings] = @checked_ratings    
+    @checkedRatings = @checked_ratings
+    @sort_column = params[:sort] || session[:sort]      #sort_by_column 
 
     @movies = Movie.where(rating: @checkedRatings).order(@sort_column || "")   #the future!
-  end
-  
-  def set_checked_ratings 
-    @all_ratings.each do |k, v|
-      unless @checked_ratings.has_key? k then @all_ratings[k] = 0 end
-    end
-    
-    if @all_ratings.values.all? {|v| v == 0} then 
-      @all_ratings.each do |key,value| @all_ratings[key] = 1 end
-    end
   end
 
   def new
